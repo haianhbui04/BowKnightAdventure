@@ -112,7 +112,7 @@ public class SceneManagement : MonoBehaviour
         yield return null;
     }
 
-    // 5️⃣ Tắt loading screen khi hoàn tất
+    // Tắt loading screen khi hoàn tất
     if (loadingScreen != null)
         loadingScreen.SetActive(false);
 }

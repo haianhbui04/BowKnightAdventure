@@ -214,13 +214,22 @@ public class PlayerController : MonoBehaviour
 
         CameraShake.instance.Shake(4f, 0.18f);
         Destroy(this.gameObject, 5f);
+        StartCoroutine(LoadGameOverAfterDelay(4f)); 
+        
+       
+    }
+    
+    private IEnumerator LoadGameOverAfterDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        SceneManagement.instance.LoadLevel("GameOver");
     }
     
     void ResetState()
     {
-    animator.SetBool("IsAttacking", false);
-    animator.SetBool("IsRunning", false);
-    moveSpeed = orginalMoveSpeed;
+        animator.SetBool("IsAttacking", false);
+        animator.SetBool("IsRunning", false);
+        moveSpeed = orginalMoveSpeed;
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
@@ -260,6 +269,7 @@ public class PlayerController : MonoBehaviour
             GameObject tempCollectEffect = Instantiate(collectEffectPrefab, other.transform.position, Quaternion.identity);
             Destroy(tempCollectEffect, .401f);
             Destroy(other.gameObject);
+            
         }
 
         if (other.CompareTag("VictoryPoint"))

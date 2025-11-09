@@ -3551,6 +3551,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6878004823396837774, guid: 51fc8c37be48f874c838bd66a73c7131, type: 3}
+      propertyPath: maxHealth
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 6878004823396837774, guid: 51fc8c37be48f874c838bd66a73c7131, type: 3}
       propertyPath: curentHeartsText
       value: 
       objectReference: {fileID: 734844969}
