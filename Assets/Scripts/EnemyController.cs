@@ -3,7 +3,8 @@ using System;
 
 public class EnemyController : MonoBehaviour
 {   
-    public int maxHealth = 3;
+    // Enemy Stats
+    public int enemyHealth = 3;
     private Animator animator;
     public float moveSpeed = 1.5f;
     public Transform groundCheckPoint;
@@ -11,20 +12,21 @@ public class EnemyController : MonoBehaviour
     public LayerMask groundLayer;
     private bool facingLeft;
 
+    // Chasing Player
     public float chaseRangeRadius = 6f;
     public LayerMask playerLayer;
     public Transform player;
     public float chaseSpeed = 2f;
     public float retrieveDistance = 3f;
    
-
+    // Components
     private Rigidbody2D rb;
     private BoxCollider2D boxCollider2D;
     public GameObject floatingTextPrefab;
     public Transform textSpawnPoint;
     public Transform attackPoint;
     public float attackRadius = 1f;
-
+    
     public float patrolRange = 5f;  
     private Vector3 startPosition;
     
@@ -40,7 +42,7 @@ public class EnemyController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (maxHealth <= 0)
+        if (enemyHealth <= 0)
         {
             Die();
         }
@@ -50,7 +52,12 @@ public class EnemyController : MonoBehaviour
             player = GameObject.FindGameObjectWithTag("Player").transform;
         }
 
-        // Player detection
+        PlayerDetection();
+        EnemyRunAnimation();
+
+    }
+    public void PlayerDetection()
+    {
         Collider2D collInfo = Physics2D.OverlapCircle(transform.position, chaseRangeRadius, playerLayer);
         RaycastHit2D hitInfo = Physics2D.Raycast(groundCheckPoint.position, Vector2.down, distance, groundLayer);
         if (collInfo)
@@ -135,9 +142,6 @@ public class EnemyController : MonoBehaviour
             }
             
         }
-
-        EnemyRunAnimation();
-
     }
     
     public void Attack()
@@ -155,11 +159,11 @@ public class EnemyController : MonoBehaviour
 
     public void TakeDamage(int damageAmount)
     {
-        if(maxHealth <= 0)
+        if(enemyHealth <= 0)
         {
             return;
         }
-        maxHealth -= damageAmount;
+        enemyHealth -= damageAmount;
         animator.SetTrigger("GetHit");
         CameraShake.instance.Shake(2.5f, 0.15f);
         Instantiate(floatingTextPrefab, textSpawnPoint.position, Quaternion.identity);

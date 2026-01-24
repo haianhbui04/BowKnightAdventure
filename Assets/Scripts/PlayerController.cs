@@ -6,7 +6,7 @@ using System.Collections;
 public class PlayerController : MonoBehaviour
 {   
     // Player Stats
-    public int maxHealth = 5;
+    public int playerHealth = 5;
     public static PlayerController instance;
     private Animator animator;
     private Rigidbody2D rb;
@@ -68,10 +68,10 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
         // Update UI
-        curentHeartsText.text = maxHealth.ToString();
+        curentHeartsText.text = playerHealth.ToString();
         currentDiamondsText.text = currentDiamonds.ToString();
         // Check for death
-        if (maxHealth <= 0)
+        if (playerHealth <= 0)
         {
             Die();
         }
@@ -85,7 +85,7 @@ public class PlayerController : MonoBehaviour
         }
 
         // Dash input
-        if (Input.GetMouseButtonDown(1)&& !isDashing)
+        if (Input.GetMouseButtonDown(1) && !isDashing)
         {
             StartCoroutine(Dash());
         }
@@ -119,7 +119,10 @@ public class PlayerController : MonoBehaviour
 
     void HandleMovement()
     {
-        if (animator.GetBool("IsAttacking")) return;
+        if (animator.GetBool("IsAttacking"))
+        {
+            return;
+        } // Đang attack thì không được chạy
         movement = Input.GetAxis("Horizontal");
         animator.SetBool("IsRunning", movement != 0);
     }
@@ -193,11 +196,11 @@ public class PlayerController : MonoBehaviour
 
     public void TakeDamage(int damageAmount)
     {
-        if (maxHealth <= 0)
+        if (playerHealth <= 0)
         {
             return;
         }
-        maxHealth -= damageAmount;
+        playerHealth -= damageAmount;
         animator.SetTrigger("takeDamage");
         CameraShake.instance.Shake(2.5f, 0.15f);
         animator.SetBool("IsAttacking", false);
@@ -237,7 +240,6 @@ public class PlayerController : MonoBehaviour
         if (collision.gameObject.CompareTag("Ground") || collision.gameObject.CompareTag("OneWayPlatform") )
         {
             animator.SetBool("Jump", false);
-
         }
     }
 
@@ -245,13 +247,13 @@ public class PlayerController : MonoBehaviour
     {
         if (other.CompareTag("Heart"))
         {
-            maxHealth += 1;
-            curentHeartsText.text = maxHealth.ToString();
+            playerHealth += 1;
+            curentHeartsText.text = playerHealth.ToString();
             GameObject tempCollectEffect = Instantiate(collectEffectPrefab, other.transform.position, Quaternion.identity);
             Destroy(tempCollectEffect, .401f);
             Destroy(other.gameObject);
         }
-        if (other.CompareTag("EnemyArrow") && maxHealth > 0)  // Only handle arrow collision if player is alive
+        if (other.CompareTag("EnemyArrow") && playerHealth > 0)  // Only handle arrow collision if player is alive
         {
             TakeDamage(1);
             Destroy(other.gameObject);
@@ -283,7 +285,7 @@ public class PlayerController : MonoBehaviour
     {
         // Apply damage continuously while staying in contact with a Suriken,
         // but only once per contactDamageInterval seconds.
-        if (other.CompareTag("Suriken") && maxHealth > 0)
+        if (other.CompareTag("Suriken") && playerHealth > 0)
         {
             if (Time.time - lastContactDamageTime >= contactDamageInterval)
             {
@@ -297,15 +299,15 @@ public class PlayerController : MonoBehaviour
     {
         isDashing = true;
 
-        float dahsDỉrection = facingRight ? 1 : -1;
+        float dashDirection = facingRight ? 1 : -1;
         // rb.gravityScale = 0f;
-        rb.linearVelocity = new Vector2(dashForce * dahsDỉrection, rb.linearVelocity.y);
+        rb.linearVelocity = new Vector2(dashForce * dashDirection, rb.linearVelocity.y);
 
         yield return new WaitForSeconds(dashDuration);
 
         isDashing = false;
         rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
-        rb.gravityScale = 3f;
+        // rb.gravityScale = 3f;
     }
 
     private void OnDrawGizmosSelected()
