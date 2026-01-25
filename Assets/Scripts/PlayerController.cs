@@ -38,6 +38,8 @@ public class PlayerController : MonoBehaviour
     // Damage while touching hazards
     public float contactDamageInterval = 0.5f; // seconds between damage ticks while touching
     private float lastContactDamageTime = 0f;
+    // Fall out of map
+    public float fallBoundary = -10f; // Y position below which player dies
     
     
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -75,6 +77,9 @@ public class PlayerController : MonoBehaviour
         {
             Die();
         }
+
+        // Check if player fell out of map
+        CheckFallOutOfMap();
 
         // Ground check
         Collider2D collInfo = Physics2D.OverlapCircle(groundCheckPoint.position, groundCheckRadius, groundLayer);
@@ -233,6 +238,15 @@ public class PlayerController : MonoBehaviour
         animator.SetBool("IsAttacking", false);
         animator.SetBool("IsRunning", false);
         moveSpeed = orginalMoveSpeed;
+    }
+
+    void CheckFallOutOfMap()
+    {
+        if (transform.position.y < fallBoundary && playerHealth > 0)
+        {
+            playerHealth = 0; // Instant death when falling out of map
+            Die();
+        }
     }
 
     private void OnCollisionEnter2D(Collision2D collision)

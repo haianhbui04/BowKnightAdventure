@@ -21,6 +21,7 @@ public class Enemy2Controller : MonoBehaviour
     public float arrowVelocity = 10f;
     private bool isPlayerInAttackRange;
     public Vector3 offset;
+    
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -49,11 +50,14 @@ public class Enemy2Controller : MonoBehaviour
 
         if (maxHealth <= 0)
         {
-
             Die();
             return;
         }
 
+        PlayerDetection();
+    }
+    public void PlayerDetection()
+    {
         Collider2D collInfo = Physics2D.OverlapCircle(transform.position + offset, attackRangeRadius, playerLayer);
 
         if (collInfo)
