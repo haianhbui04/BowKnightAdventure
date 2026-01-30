@@ -105,6 +105,7 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
+        // Move the player
         transform.position += new Vector3(movement * moveSpeed, 0, 0) * Time.fixedDeltaTime;
     }
 
@@ -149,7 +150,6 @@ public class PlayerController : MonoBehaviour
 
     void HandleAttack()
     {
-        
         // Nhấn chuột trái
         if (Input.GetMouseButtonDown(0))
         {

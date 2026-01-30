@@ -58,7 +58,9 @@ public class EnemyController : MonoBehaviour
     }
     public void PlayerDetection()
     {
+        // OverlapCircle để kiểm tra xem có player hay không
         Collider2D collInfo = Physics2D.OverlapCircle(transform.position, chaseRangeRadius, playerLayer);
+        // Raycast để kiểm tra xem có ground hay không
         RaycastHit2D hitInfo = Physics2D.Raycast(groundCheckPoint.position, Vector2.down, distance, groundLayer);
         if (collInfo)
         {
@@ -124,6 +126,7 @@ public class EnemyController : MonoBehaviour
                     facingLeft = true;
                 }
             }
+            // Kiểm tra xem đã đi được quãng đường patrolRange chưa
             float distanceFromStart = Vector3.Distance(transform.position, startPosition);
             if (distanceFromStart >= patrolRange)
             {
@@ -222,7 +225,17 @@ public class EnemyController : MonoBehaviour
         Gizmos.DrawLine(leftBound, rightBound);
         Gizmos.DrawWireSphere(leftBound, 0.1f);
         Gizmos.DrawWireSphere(rightBound, 0.1f);
-        
+
+        // Vẽ đường retrieveDistance theo hướng player
+        if (player != null)
+        {
+            Gizmos.color = Color.cyan;
+            Vector3 enemyPos = transform.position;
+            Vector3 targetPos = new Vector3(player.position.x, enemyPos.y, enemyPos.z);
+            Vector3 dirToPlayer = (targetPos - enemyPos).normalized;
+
+            Gizmos.DrawLine(enemyPos, enemyPos + dirToPlayer * retrieveDistance);
+        }
     }
 
     void EnemyRunAnimation()

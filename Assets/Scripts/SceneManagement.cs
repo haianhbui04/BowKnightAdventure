@@ -63,101 +63,101 @@ public class SceneManagement : MonoBehaviour
         }
     }
 
- private IEnumerator LoadLevelAsync(string scenePath)
-{
-    // Luôn bật Loading Screen trước
-    if (loadingScreen != null)
-        loadingScreen.SetActive(true);
-
-    // Sau đó mới ẩn các UI khác
-    HideAllUIExceptLoading();
-
-    // Lấy tên scene (loại bỏ .unity)
-    string sceneName = System.IO.Path.GetFileNameWithoutExtension(scenePath);
-    if (levelLabel != null)
-        levelLabel.text = "Loading " + sceneName + "...";
-
-    // Bắt đầu load scene bất đồng bộ
-    AsyncOperation operation = SceneManager.LoadSceneAsync(sceneName);
-    operation.allowSceneActivation = false;
-
-    float displayedProgress = 0f;
-
-    while (!operation.isDone)
+    private IEnumerator LoadLevelAsync(string scenePath)
     {
-        // Unity chỉ tăng đến 0.9 khi chưa kích hoạt scene
-        float targetProgress = Mathf.Clamp01(operation.progress / 0.9f);
+        // Luôn bật Loading Screen trước
+        if (loadingScreen != null)
+            loadingScreen.SetActive(true);
 
-        // Làm mượt tiến trình (chạy đều từ 0 → 1)
-        displayedProgress = Mathf.Lerp(displayedProgress, targetProgress, Time.deltaTime * 3f);
+        // Sau đó mới ẩn các UI khác
+        HideAllUIExceptLoading();
 
-        // Cập nhật UI
-        if (progressBar != null)
-            progressBar.value = displayedProgress;
+        // Lấy tên scene (loại bỏ .unity)
+        string sceneName = System.IO.Path.GetFileNameWithoutExtension(scenePath);
+        if (levelLabel != null)
+            levelLabel.text = "Loading " + sceneName + "...";
 
-        if (progressText != null)
-            progressText.text = Mathf.RoundToInt(displayedProgress * 100f) + "%";
+        // Bắt đầu load scene bất đồng bộ
+        AsyncOperation operation = SceneManager.LoadSceneAsync(sceneName);
+        operation.allowSceneActivation = false;
 
-        // Khi gần xong (>=0.9) → đợi 1 chút rồi cho load scene
-        if (displayedProgress >= 0.995f)
+        float displayedProgress = 0f;
+
+        while (!operation.isDone)
         {
-            if (progressBar != null) progressBar.value = 1f;
-            if (progressText != null) progressText.text = "100%";
+            // Unity chỉ tăng đến 0.9 khi chưa kích hoạt scene
+            float targetProgress = Mathf.Clamp01(operation.progress / 0.9f);
 
-            // Delay nhỏ để người chơi thấy loading đầy
-            yield return new WaitForSeconds(0.5f);
-            operation.allowSceneActivation = true;
-        }
+            // Làm mượt tiến trình (chạy đều từ 0 → 1)
+            displayedProgress = Mathf.Lerp(displayedProgress, targetProgress, Time.deltaTime * 3f);
 
-        yield return null;
-    }
+            // Cập nhật UI
+            if (progressBar != null)
+                progressBar.value = displayedProgress;
 
-    // Tắt loading screen khi hoàn tất
-    if (loadingScreen != null)
-        loadingScreen.SetActive(false);
-}
+            if (progressText != null)
+                progressText.text = Mathf.RoundToInt(displayedProgress * 100f) + "%";
 
-private void HideAllUIExceptLoading()
-{
-    // Lấy scene hiện tại
-    var currentScene = SceneManager.GetActiveScene();
-
-#if UNITY_2023_1_OR_NEWER
-    Canvas[] allCanvas = FindObjectsByType<Canvas>(FindObjectsSortMode.None);
-#else
-    Canvas[] allCanvas = FindObjectsOfType<Canvas>(true);
-#endif
-
-    foreach (Canvas canvas in allCanvas)
-    {
-        if (canvas == null) continue;
-
-        // Nếu canvas không thuộc scene hiện tại, bỏ qua (ví dụ canvas global của hệ thống)
-        if (canvas.gameObject.scene != currentScene) continue;
-
-        // Duyệt tất cả direct children của canvas (thường là các panel, menu, hud, v.v.)
-        for (int i = 0; i < canvas.transform.childCount; i++)
-        {
-            Transform child = canvas.transform.GetChild(i);
-            if (child == null) continue;
-
-            GameObject go = child.gameObject;
-
-            // Bỏ qua nếu chính là loadingScreen hoặc là descendant của loadingScreen
-            if (loadingScreen != null)
+            // Khi gần xong (>=0.9) → đợi 1 chút rồi cho load scene
+            if (displayedProgress >= 0.995f)
             {
-                if (go == loadingScreen || go.transform.IsChildOf(loadingScreen.transform))
-                {
-                    // giữ lại
-                    continue;
-                }
+                if (progressBar != null) progressBar.value = 1f;
+                if (progressText != null) progressText.text = "100%";
+
+                // Delay nhỏ để người chơi thấy loading đầy
+                yield return new WaitForSeconds(0.5f);
+                operation.allowSceneActivation = true;
             }
 
-            // Tắt child UI (panel) này
-            go.SetActive(false);
+            yield return null;
+        }
+
+        // Tắt loading screen khi hoàn tất
+        if (loadingScreen != null)
+            loadingScreen.SetActive(false);
+    }
+
+    private void HideAllUIExceptLoading()
+    {
+        // Lấy scene hiện tại
+        var currentScene = SceneManager.GetActiveScene();
+
+    #if UNITY_2023_1_OR_NEWER
+        Canvas[] allCanvas = FindObjectsByType<Canvas>(FindObjectsSortMode.None);
+    #else
+        Canvas[] allCanvas = FindObjectsOfType<Canvas>(true);
+    #endif
+
+        foreach (Canvas canvas in allCanvas)
+        {
+            if (canvas == null) continue;
+
+            // Nếu canvas không thuộc scene hiện tại, bỏ qua (ví dụ canvas global của hệ thống)
+            if (canvas.gameObject.scene != currentScene) continue;
+
+            // Duyệt tất cả direct children của canvas (thường là các panel, menu, hud, v.v.)
+            for (int i = 0; i < canvas.transform.childCount; i++)
+            {
+                Transform child = canvas.transform.GetChild(i);
+                if (child == null) continue;
+
+                GameObject go = child.gameObject;
+
+                // Bỏ qua nếu chính là loadingScreen hoặc là descendant của loadingScreen
+                if (loadingScreen != null)
+                {
+                    if (go == loadingScreen || go.transform.IsChildOf(loadingScreen.transform))
+                    {
+                        // giữ lại
+                        continue;
+                    }
+                }
+
+                // Tắt child UI (panel) này
+                go.SetActive(false);
+            }
         }
     }
-}
 
 
 
